@@ -99,10 +99,30 @@ print_r($people[0]["First name"] . " " . $people[1]["E-mail"]);
 }*/
 
 //Куки
-setcookie("name", "Denis", time() + 86400 * 30);
-if(isset($_COOKIE["name"])) {
-    echo $_COOKIE["name"];
+//setcookie("name", "Denis", time() + 86400 * 30);
+//if(isset($_COOKIE["name"])) {
+//    echo $_COOKIE["name"];
+//}
+
+//Сессии
+session_start(); //Заускаем сессию
+//Проверяем факт отправки пользователем данных через форму
+if(isset($_POST["submit"])) {
+    //Этой командой мы фильтруем вводимый пользователем на форме текст, предотваращая таким образом, например, ввод вредоносного кода javascript
+    $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
+    $password = $_POST["password"];
+
+    if ($username == "john" && $password == "password") {
+        //Если имя пользователя и пароль подходят - назначаем сессии в качестве идентификатора имя пользоватлея
+        $_SESSION["username"] = $username;
+        //Перенаправляем пользователя на указанную страницу
+        header("Location: dashboard.php");
+    } else {
+        //Если пароль и имя пользователя не подошли - выводим сообщение об ошибке
+        echo "Incorrect login or password";
+    }
 }
+
 ?>
 
 <!-- <a href="<?php echo $_SERVER["PHP_SELF"];?>?name=Denis&age=30">Click</a>
@@ -117,3 +137,14 @@ if(isset($_COOKIE["name"])) {
 </div>
 <input type="submit" value="Submit" name="submit">
 </form> -->
+<form action="<?php echo $_SERVER["PHP_SELF"];?>" method="POST">
+<div>
+    <label for="username">Userame: </label>
+    <input type="text" name="username">
+</div>
+<div>
+    <label for="password">Password: </label>
+    <input type="password" name="password">
+</div>
+<input type="submit" value="Submit" name="submit">
+</form>
