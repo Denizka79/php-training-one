@@ -105,7 +105,7 @@ print_r($people[0]["First name"] . " " . $people[1]["E-mail"]);
 //}
 
 //Сессии
-session_start(); //Заускаем сессию
+/* session_start(); //Заускаем сессию
 //Проверяем факт отправки пользователем данных через форму
 if(isset($_POST["submit"])) {
     //Этой командой мы фильтруем вводимый пользователем на форме текст, предотваращая таким образом, например, ввод вредоносного кода javascript
@@ -120,6 +120,47 @@ if(isset($_POST["submit"])) {
     } else {
         //Если пароль и имя пользователя не подошли - выводим сообщение об ошибке
         echo "Incorrect login or password";
+    }
+} */
+
+//Работа с файлами
+//Чтение файла
+/*$file = "users.txt";
+if (file_exists($file)) { //проверяем существует ли файл
+    $handle = fopen($file, "r"); //открываем файла на чтение
+    $contents = fread($handle, filesize($file)); //считываем содержимое файла в переменную
+    fclose($handle); //закрываем файл после считывания
+    echo $contents;
+} else {
+    $handle = fopen($file, "w"); //если такого файла нет, то создаем его
+    $contents = "John" . PHP_EOL . "Mary" . PHP_EOL . "Bob" . PHP_EOL . "Amanda"; //Создаем контент для файла, где PHP_EOL - перенос строки
+    fwrite($handle, $contents); //Записываем контент в файл
+    fclose($handle);
+} */
+
+//Закачка файлов
+if (isset($_POST["submit"])) { /*Проверяем была ли нажата кнопка submit*/
+    $allowed_ext = array("png","jpg","jpeg","gif"); /*Создаем список разрешенных расширений файлов для закачки*/
+    if (!empty($_FILES["upload"]["name"])) { /*Проверяем есть ли имя закачиваемого файла*/
+        $file_name = $_FILES["upload"]["name"];
+        $file_size = $_FILES["upload"]["size"];
+        $file_tmp = $_FILES["upload"]["tmp_name"];
+        $target_dir = "uploads/" . $file_name;
+        $file_ext = explode(".", $file_name);
+        $file_ext = strtolower(end($file_ext));
+        if (in_array($file_ext, $allowed_ext)) {
+            if ($file_size <= 1000000) {
+                move_uploaded_file($file_tmp, $target_dir);
+                $message = "<p style='color: green;'>File uploaded</p>";
+            } else {
+                $message = "<p style='color: red;'>The file is too large</p>";
+            }
+
+        } else {
+            $message = "<p style='color: red;'>Invalid file type</p>";
+        }
+    } else {
+        $message = "<p style='color: red;'>Please choose a file</p>"; /*Если файла нет - формируем сообщение о том, что необходимо файл выбрать*/
     }
 }
 
@@ -137,7 +178,8 @@ if(isset($_POST["submit"])) {
 </div>
 <input type="submit" value="Submit" name="submit">
 </form> -->
-<form action="<?php echo $_SERVER["PHP_SELF"];?>" method="POST">
+
+<!-- <form action="<?php echo $_SERVER["PHP_SELF"];?>" method="POST">
 <div>
     <label for="username">Userame: </label>
     <input type="text" name="username">
@@ -147,4 +189,24 @@ if(isset($_POST["submit"])) {
     <input type="password" name="password">
 </div>
 <input type="submit" value="Submit" name="submit">
-</form>
+</form> -->
+
+<!-- Закачка файлов -->
+<!-- Создаем форму для закачки файлов -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIle upload</title>
+</head>
+<body>
+    <?php echo $message ?? null ?> <!-- Если переменная message не равна null - её содержимое будет выведено на экран -->
+    <form action="<?php echo $_SERVER["PHP_SELF"]?>" method="POST" enctype="multipart/form-data"> <!-- Для осуществления загрузки файлов через форму обязательно наличие атрибута enctype-->
+    Select file to upload:
+    <input type="file" name="upload">
+    <input type="submit" value="Submit" name="submit">
+    </form>
+</body>
+</html>
